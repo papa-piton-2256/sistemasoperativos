@@ -5,9 +5,13 @@
 #include <unistd.h>
 
 /*Definicion de variables globales*/
-int EAX,EBX,ECX,EDX;
-int PC;
+int EAX=0,EBX=0,ECX=0,EDX=0;
+int PC=0;
 char IR[100];
+char codop[2];
+char reg1[2];
+char reg2[2];
+
 
 int kbhit(void){
     struct timeval tv;
@@ -25,43 +29,57 @@ int kbhit(void){
 }
 
 void asignar(char codop[],char registro1[],char registro2[]){
-  printf("\n");	
-  char cod[3];
-  char reg1[3];
-  char reg2[3];
- 
-  sscanf(codop,"%2s",cod);
-  sscanf(registro1,"%2s",reg1);
-  sscanf(registro2,"%3s",reg2);
-  printf("%s,%s,%s\n",cod,reg1,reg2);
+   PC+=1;
+	printf("\r%d\t%s\n",PC,IR);
+    //printf("%s %s %s\n",codop,registro1,registro2);
+
+
+
+
 }
 
 int recibelinea(char *linea){ 
-	char codop[3];
-	char registro1[3];
+	char codop[3];char instru[3];
+	char registro1[3];char re1[3];
 	char registro2[3];
 
 	sscanf(linea,"%3s",codop);
-	printf("\n\r%s",codop);
-	
-	if(strcmp(codop,"MOV")==0||strcmp(codop,"ADD")==0){
+	//printf("\n\r%s",codop);	
+	//if(strcmp(codop,"MOV")==0||strcmp(codop,"ADD")==0||strcmp(codop,"SUB")==0||strcmp(codop,"MUL")==0||strcmp(codop,"DIV")==0){
 	linea+=4;	
+	fflush(stdin);
 	sscanf(linea,"%3s",registro1);
-    printf("\n\r%s",registro1);
+    //printf("\n\r%s",registro1);
     linea+=4;
+    fflush(stdin);
     sscanf(linea,"%3s",registro2);
-    printf("\n\r%s",registro2);
+ 
+	if(strcmp(codop,"DEC")!=0&&strcmp(codop,"INC")!=0&&strcmp(codop,"END")!=0){
+	strcpy(IR, codop); 
+	strcat(IR, " ");
+    strcat(IR, registro1);
+    strcat(IR, ",");
+    strcat(IR, registro2);
+    }else{
+    strcpy(IR, codop); 
+	strcat(IR, " ");
+    strcat(IR, registro1);
+    }
+    
     asignar(codop,registro1,registro2);
-	}	
-	if(strcmp(codop,"INC")==0){
-    linea+=4;	
-	sscanf(linea,"%3s",registro1);
-	sscanf("I","%s",registro2);
-    asignar(codop,registro1,registro2);
+
+	int lon=strlen(codop);
+	int lon2=strlen(registro2);
+	int i=0,f=0;
+	while(i<lon){
+		instru[i]=codop[i];
+		i++;
 	}
-	if(strcmp(codop, "END") == 0){
-		printf("\n");
+	while(f<lon){
+		re1[f]=registro1[f];
+		f++;
 	}
+
 	return 0;
 }
 
@@ -111,6 +129,8 @@ int main(int argc, char const *argv[]){
             	}
             } 
 
+            printf("\n\n\rPC\tIR\t\tEAX\tEBX\tECX\tEDX\n");
+  			printf("\r------------------------------------------------------\n");
             while(feof(archivo)==0){
           	fgets(linea,50,archivo); 
           	recibelinea(linea);
