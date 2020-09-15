@@ -28,21 +28,31 @@ int kbhit(void){
     return 0;
 }
 
-void asignar(char codop[],char registro1[],char registro2[]){
-   PC+=1;
+void asignar(char codop[],char registro1[],char regis2[]){
+    PC+=1;
 	printf("\r%d\t%s\n",PC,IR);
-    //printf("%s %s %s\n",codop,registro1,registro2);
-
-
-
+    printf("Tokens:(%s)(%s)(%s)\n",codop,registro1,regis2);
+    
+    /*if(strcmp(codop,"END")==0){
+        printf("\n");
+    }*/
 
 }
 
 int recibelinea(char *linea){ 
 	char codop[3];char instru[3];
 	char registro1[3];char re1[3];
-	char registro2[3];
+	char registro2[3];char regis2[10];
 
+	int longline=strlen(linea);
+    int cuenta;int cuenta2=0;
+    for(cuenta=0;cuenta<longline-1;cuenta++){
+        if(cuenta<=7){
+        }else{
+        regis2[cuenta2]=linea[cuenta];
+        cuenta2++;  
+        }   
+    }
 	sscanf(linea,"%3s",codop);
 	//printf("\n\r%s",codop);	
 	//if(strcmp(codop,"MOV")==0||strcmp(codop,"ADD")==0||strcmp(codop,"SUB")==0||strcmp(codop,"MUL")==0||strcmp(codop,"DIV")==0){
@@ -50,23 +60,26 @@ int recibelinea(char *linea){
 	fflush(stdin);
 	sscanf(linea,"%3s",registro1);
     //printf("\n\r%s",registro1);
-    linea+=4;
+    /*linea+=4;
     fflush(stdin);
-    sscanf(linea,"%3s",registro2);
+    sscanf(linea,"%3s",registro2);*/
  
 	if(strcmp(codop,"DEC")!=0&&strcmp(codop,"INC")!=0&&strcmp(codop,"END")!=0){
 	strcpy(IR, codop); 
 	strcat(IR, " ");
     strcat(IR, registro1);
     strcat(IR, ",");
-    strcat(IR, registro2);
+    strcat(IR, regis2);
     }else{
+    	if(strcmp(codop,"END")==0){
+            registro1[0]='\0';
+        }
     strcpy(IR, codop); 
 	strcat(IR, " ");
     strcat(IR, registro1);
     }
     
-    asignar(codop,registro1,registro2);
+    asignar(codop,registro1,regis2);
 
 	int lon=strlen(codop);
 	int lon2=strlen(registro2);
@@ -136,6 +149,7 @@ int main(int argc, char const *argv[]){
           	recibelinea(linea);
           	sleep(1);
           	}
+          	 fclose(archivo);
         strcpy(comando," ");
        	strcpy(nombreArchivo," ");
        	//clear();
