@@ -12,6 +12,17 @@ char codop[2];
 char reg1[2];
 char reg2[2];
 
+void menu_responsivo(){
+        int x,y;
+        getmaxyx(stdscr,y,x);
+        move(1,0);
+        hline('$',x);
+        move(y/2,0);
+        hline('$',x);
+	move(2,1);
+	refresh();
+}
+
 
 int kbhit(void){
     struct timeval tv;
@@ -40,9 +51,9 @@ void asignar(char codop[],char registro1[],char regis2[]){
 }
 
 int recibelinea(char *linea){ 
-	char codop[3];char instru[3];
-	char registro1[3];char re1[3];
-	char registro2[3];char regis2[10];
+
+
+	char codop[4], instru[4], registro1[4], re1[4], registro2[4],regis2[11];
 
 	int longline=strlen(linea);
     int cuenta;int cuenta2=0;
@@ -97,58 +108,67 @@ int recibelinea(char *linea){
 }
 
 int main(int argc, char const *argv[]){
-	
-    char comando[10];
-    char linea[20];
-    char nombreArchivo[15]="";
-	int cont=1;
-	char respuesta[2];
-
+    char comando[10],linea[20],nombreArchivo[15]="",respuesta[2];
+    int cont=1,y,x;
+ 
     FILE *archivo;
-
+    
     initscr();
-
-    while(strcmp(comando, "salir") != 0){
-        mvprintw(0,0,"(ejecutar/salir) ");  
-        move(0,20);  
-        refresh();  
-
-        if(kbhit()){
-            mvscanw(0,20,"%s %s",comando,nombreArchivo); 
-            mvprintw(0,0,"(ejecutar/salir)");  
-            move(0,20);  
+    keypad(stdscr,TRUE);
+    menu_responsivo();
+    getmaxyx(stdscr,y,x);
+    int pad=strlen("(ejecutar/salir)>");
+	 
+   while( strcmp(comando, "salir") != 0){
+       
+	 mvprintw(2,x/2,"(ejecutar/salir)>");  
+         refresh();  
+     	
+	if(kbhit()){
+            mvscanw(2,x/2+pad,"%s %s",comando,nombreArchivo); 
+            mvprintw(2,x/2,"(ejecutar/salir)>");  
+            move(1,20);  
             refresh();
-        } 
+         }
 
-    	if(strcmp(comando,"ejecutar") == 0){
+    	else if(strcmp(comando,"ejecutar") == 0){
     		archivo = fopen(nombreArchivo, "r");
         	if(archivo == NULL){
             clear();
-            mvprintw(0,0,"No se pudo abrir el archivo %s\n",nombreArchivo);
-            mvprintw(1,0,"Desea abrir otro archivo?(S/N)"); 
-            move(1,33);
+            menu_responsivo();
+            mvprintw(1,1,"No se pudo abrir el archivo %s\n",nombreArchivo);
+            mvprintw(2,1,"Desea abrir otro archivo?(S/N)"); 
+            move(2,34);
             refresh();  
-            mvscanw(1,33,"%s",respuesta);
+            mvscanw(2,34,"%s",respuesta);
           
             	if(strcmp(respuesta,"N")==0){
                 	endwin();
-                	exit(0);
+			exit(0);
+			break;
             	}else{
             	clear();
             	refresh(); 
             	strcpy(comando," ");
             	strcpy(nombreArchivo," ");
-            	continue;
             	}
-            } 
+		}
+            
 
-            printf("\n\n\rPC\tIR\t\tEAX\tEBX\tECX\tEDX\n");
-  			printf("\r------------------------------------------------------\n");
+	menu_responsivo();
             while(feof(archivo)==0){
-          	fgets(linea,50,archivo); 
+          	if(!kbhit()){
+		fgets(linea,50,archivo); 
           	recibelinea(linea);
           	sleep(1);
+		}else{
+		mvscanw(2,x/2+pad,"%s %s",comando,nombreArchivo); 
+            mvprintw(2,x/2,"(ejecutar/salir)>");  
+            move(1,20);  
+            refresh();
+		}
           	}
+		
           	 fclose(archivo);
         strcpy(comando," ");
        	strcpy(nombreArchivo," ");
